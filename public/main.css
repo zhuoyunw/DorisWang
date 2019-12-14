@@ -1,0 +1,28 @@
+.card {
+    display:inline-block !important;
+}
+#abstract {
+	padding-top: 1em;
+	padding-bottom: 1em;
+}
+.code {
+	margin-right: 100px;
+	margin-left: 250px;
+}
+.codechunk{
+    width:50%;
+    margin-right:2%;
+    float: left;
+}
+.codechunk iframe{
+   width:100%;
+}
+.boxed {
+    width:50%;
+    float: left;
+}
+.footer, .header {
+	padding-top:2em;
+}
+
+

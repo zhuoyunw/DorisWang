@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MathViz19 IGL Project - Zhuoyun Wang</title>
+
+    <link rel="stylesheet" href="main.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="icon" href="images/favicon.png" />
+  </head>
+
+  <body>
+    <div class="container-fluid">
+        <div class="row">
+          <div class="col-sm">
+          </div>
+          <div class="col-sm-7">
+            <h2 class="text-center">Confidence Interval Visualizations for Bivariate Linear Regression Models</h2>
+            <h4 class="text-center">December 9th, 2019</h5>
+            <h4 class="text-center">Zhuoyun Wang</h5>
+            <p>
+                    Linear regression is a basic and commonly used type of predictive 
+			        analysis and the simple linear regression model is first model 
+			        introduced to students in Statistics and sets the foundation for 
+					more complicated models. Confidence Intervals (CI) of the linear 
+					regression models are computed from the statistics of the observed 
+					data and might contain the true value of unknown population 
+					parameters. Having a clear understanding of the Confidence Interval 
+					should be a requirement for Statistics students since they have 
+					close relationships with other statistics topics, such as significance 
+					testing, and are crucial to evaluate the reliability of the estimates. 
+					This project visualizates confidence bands (surfaces in 3D) for 
+					the estimated response variable, and uses bootstrap resampling 
+					techniques to illustrate the confidence level. The deliverables can 
+					be used as tools to facilitate understanding of CI and linear regression 
+					system as a whole.
+
+            </p>
+            </div>
+            <div class="col-sm">
+            </div>
+        </div>
+        <div class="row text-center">
+            <div class="col-sm">
+			</div>
+            <div class="col-sm-12">
+                <div class="card" style="width: 50rem;">
+                    <!-- <img src="media/four.png" class="card-img-top" alt="..."> -->
+                    <div class="card-body">
+                        <h5 class="card-title">Deliverables</h5>
+                        <p class="card-text">Code, Visualization, and Narrative Report</p>
+                        <a href="BivariateRegressions/rgl_code.R" class="btn btn-primary">View Code</a>
+						<a href="BivariateRegressions/rgl_code2.html" class="btn btn-primary">View Visualization</a>
+                        <a href="https://drive.google.com/file/d/1qA1eM_qGJqbzBIGpYSP0QIf1rCkDIc3G/view?usp=sharing" class="btn btn-primary">View Narrative</a>
+                    </div>
+                </div>
+			<div class='col-sm'>
+			</div>
+            <div class="col-sm-13">
+			    <div class='code' leftmargin='0'>
+				    <div class="code-body">
+					    <br>
+			            <h5 class="text-center">You can try implementing the algorithm on your own dataset here:</h5>
+						<br>
+						<div class="codechunk">
+					         <iframe width='450' height='300' src='https://rdrr.io/snippets/embed/' frameborder='0'></iframe>
+						</div>
+						<div class="boxed" style="border: 1px solid green; width: 20rem">
+						    <h5 class="boxed-title" style="font-size:15px; margin-top: 0.5rem">Please follow the instructions:</h5>
+						    <p align="left" style="font-size:13px">
+							  
+								  <br>1. Click on the "View Code" button above to copy and paste the code to the box on the left
+								  <br>2. Change the directory in Line 15 to where your data is located
+								  <br>3. Change the assginment of x, y, and z so that they correspond to your predictor #1, #2, and response variable, respectively
+								  <br>4. Change the value of "r" in Line 32 so that the spheres have proper size
+								  <br>5. Change the values of "r" in Line 91, 102, 110, 118, and 126 so that the spheres of resamples can stand out from the original sample
+								  
+							</p>
+						</div>
+			        </div>
+			    </div>
+            </div>
+            </div>
+        </div>
+    </div>
+  </body>
+</html>

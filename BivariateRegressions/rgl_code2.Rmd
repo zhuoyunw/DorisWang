@@ -1,0 +1,174 @@
+---
+title: "Confidence Interval Visualization"
+author: "Zhuoyun Wang"
+date: "12/1/2019"
+output: html_document
+---
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+#install.packages('rgl')
+#install.packages('magick')
+library(rgl)
+library(magick)
+library(caret)
+#datasets <- c("Data1", "Data2", "Data3", "Data4")
+#links <- c("D:\\Math492\\dataset.csv", 
+           #"D:\\Math492\\f4.csv", 
+           #"D:\\Math492\\f5.csv", 
+           #"D:\\Math492\\f6.csv")
+#i <- select.list(datasets, title="Choose a Dataset")
+#dataset <- xmlToDataFrame(links[datasets==i])
+
+# Reading data
+dataset = read.csv("D:\\Math492\\dataset.csv", header=T)
+x = dataset$V1
+y = dataset$V2
+z = dataset$V3
+
+# RGL setup
+rgl_init <- function(new.device = FALSE, bg = "white", width = 640) { 
+  if( new.device | rgl.cur() == 0 ) {
+    rgl.open()
+    par3d(windowRect = 50 + c( 0, 0, width, width ) )
+    rgl.bg(color = bg )
+  }
+  rgl.clear(type = c("shapes", "bboxdeco"))
+  rgl.viewpoint(theta = 15, phi = 20, zoom = 0.4)
+}
+
+rgl_init(new.device = FALSE, bg = "white", width = 640)
+rgl.spheres(x, z, y, r = 4, color = "lightgrey")
+rgl_add_axes <- function(x, y, z, axis.col = "grey",
+                         xlab = "", ylab="", zlab="", show.plane = TRUE, 
+                         show.bbox = FALSE, bbox.col = c("lightgrey","black")){ 
+  lim <- function(x){c(-max(abs(x)), max(abs(x))) * 1.1}
+  # Add axes
+  xlim <- lim(x)
+  ylim <- lim(y)
+  zlim <- lim(z)
+  rgl.lines(xlim, c(0, 0), c(0, 0), color = axis.col)
+  rgl.lines(c(0, 0), ylim, c(0, 0), color = axis.col)
+  rgl.lines(c(0, 0), c(0, 0), zlim, color = axis.col)
+  
+  # Add a point at the end of each axes to specify the direction
+  axes <- rbind(c(xlim[2], 0, 0), c(0, ylim[2], 0), c(0, 0, zlim[2]))
+  rgl.points(axes, color = axis.col, size = 3)
+  
+  # Add axis labels
+  rgl.texts(axes, text = c(xlab, ylab, zlab), color = axis.col,
+            adj = c(0.5, -0.8), size = 2)
+  
+  # Add plane
+  if(show.plane) 
+    xlim <- xlim/1.1; zlim <- zlim /1.1
+  rgl.quads( x = rep(xlim, each = 2), y = c(0, 0, 0, 0),
+             z = c(zlim[1], zlim[2], zlim[2], zlim[1]))
+  
+  # Add bounding box decoration
+  if(show.bbox){
+    rgl.bbox(color=c(bbox.col[1],bbox.col[2]), alpha = 0.5, 
+             emission=bbox.col[1], specular=bbox.col[1], shininess=5, 
+             xlen = 3, ylen = 3,zlen =3)
+  }
+}
+rgl_add_axes(x, y, z, show.plane = F, show.bbox = T)
+aspect3d(1, 1, 1)
+fit = lm(V3 ~ V1 + V2, data = dataset)
+grid_lines = 50
+x_pred = seq(min(x), max(x), length.out = grid_lines)
+y_pred = seq(min(y), max(y), length.out = grid_lines)
+xy = expand.grid(V1 = x_pred, V2 = y_pred)
+z_pred = matrix(predict(fit, newdata = xy),
+                nrow = 50, ncol = 50)
+regression_srf = rgl.surface(x_pred , y_pred , z_pred, color = "purple", alpha = 0.5, lit = F)
+z_pred_lwr = matrix(predict(fit, newdata = xy, interval = "confidence", level = 0.99)[, 2], nrow = 50, ncol = 50)
+z_pred_upr = matrix(predict(fit, newdata = xy, interval = "confidence", level = 0.99)[, 3], nrow = 50, ncol = 50)
+conf_lower_0.95 = rgl.surface(x_pred, y_pred, z_pred_lwr, color = "green", alpha = 0.5, lit = F)
+conf_upper_0.95 = rgl.surface(x_pred, y_pred, z_pred_upr, color = "blue", alpha = 0.5, lit = F)
+
+# Creating Resamples
+df = data.frame(x,y,z)
+set.seed(492)
+x_resample_i = createResample(df$x, times = 5)
+df1 = df[unlist(x_resample_i[1]), ]
+sphere1 = rgl.spheres(df1$x, df1$z, df1$y, r = 7, color = "red")
+fit1 = lm(z ~ x + y, data = df1)
+xy1 = expand.grid(x = df1$x, y = df1$y)
+z_pred1 = matrix(predict(fit1, newdata = xy1), nrow(dataset), nrow(dataset))
+regression_srf1 = rgl.surface(df1$x, df1$y, z_pred1, color = "red", alpha = 0.5, lit = F)
+
+
+df2 = df[unlist(x_resample_i[2]), ]
+fit2 = lm(z ~ x + y, data = df2)
+xy2 = expand.grid(x = df2$x, y = df2$y)
+sphere2 = rgl.spheres(df2$x, df2$z, df2$y, r = 7, color = "orange")
+z_pred2 = matrix(predict(fit2, newdata = xy2), nrow(dataset), nrow(dataset))
+regression_srf2 = rgl.surface(df2$x, df2$y, z_pred2, color = "orange", alpha = 0.5, lit = F)
+
+df3 = df[unlist(x_resample_i[3]), ]
+fit3 = lm(z ~ x + y, data = df3)
+xy3 = expand.grid(x = df3$x, y = df3$y)
+sphere3 = rgl.spheres(df3$x, df3$z, df3$y, r = 7, color = "brown")
+z_pred3 = matrix(predict(fit3, newdata = xy3), nrow(dataset), nrow(dataset))
+regression_srf3 = rgl.surface(df3$x, df3$y, z_pred3, color = "brown", alpha = 0.5, lit = F)
+
+df4 = df[unlist(x_resample_i[4]), ]
+fit4 = lm(z ~ x + y, data = df4)
+xy4 = expand.grid(x = df4$x, y = df4$y)
+sphere4 = rgl.spheres(df4$x, df4$z, df4$y, r = 7, color = "cyan1")
+z_pred4 = matrix(predict(fit4, newdata = xy4), nrow(dataset), nrow(dataset))
+regression_srf4 = rgl.surface(df4$x, df4$y, z_pred4, color = "cyan1", alpha = 0.5, lit = F)
+
+df5 = df[unlist(x_resample_i[5]), ]
+fit5 = lm(z ~ x + y, data = df5)
+xy5 = expand.grid(x = df5$x, y = df5$y)
+sphere5 = rgl.spheres(df5$x, df5$z, df5$y, r = 7, color = "salmon2")
+z_pred5 = matrix(predict(fit5, newdata = xy5), nrow(dataset), nrow(dataset))
+regression_srf5 = rgl.surface(df5$x, df5$y, z_pred5, color = "salmon2", alpha = 0.5, lit = F)
+
+# Creating User-Interactive Buttons
+subid <- currentSubscene3d()
+rglwidget() %>%
+  toggleWidget(ids = regression_srf, label = "Regression 0") %>%
+  toggleWidget(ids = sphere1, label = 'Resamples #1') %>%
+  toggleWidget(ids = regression_srf1, label = "Regression 1") %>%
+  toggleWidget(ids = sphere2, label = 'Resamples #2') %>%
+  toggleWidget(ids = regression_srf2, label = "Rregression 2") %>%
+  toggleWidget(ids = sphere3, label = 'Resamples #3') %>%
+  toggleWidget(ids = regression_srf3, label = "Rregression 3") %>%
+  toggleWidget(ids = sphere4, label = 'Resamples #4') %>%
+  toggleWidget(ids = regression_srf4, label = 'Regression 4') %>%
+  toggleWidget(ids = sphere5, label = 'Resamples #5') %>%
+  toggleWidget(ids = regression_srf5, label = 'Regression 5')
+```
+
+**Click the button once to make the corresponding item disappear & click again to make it reappear**
+
+*Blue surface*: upper limit of the 99% confidence interval of the fitted values
+
+*Green surface*: lower limit of the 99% confidence interval of the fitted values 
+
+*Regression 0*: the regression plane of the original sample
+
+*Resamples #1*: the 1st collection of bootstrap resamples
+
+*Regression 1*: the regression plane of the 1st collection of bootstrap resamples
+
+*Resamples #2*: the 2nd collection of bootstrap resamples
+
+*Regression 2*: the regression plane of the 2nd collection of bootstrap resamples
+
+*Resamples #3*: the 3rd collection of bootstrap resamples
+
+*Regression 3*: the regression plane of the 3rd collection of bootstrap resamples
+
+*Resamples #4*: the 4th collection of bootstrap resamples
+
+*Regression 4*: the regression plane of the 4th collection of bootstrap resamples
+
+*Resamples #5*: the 5th collection of bootstrap resamples
+
+*Regression 5*: the regression plane of the 5th collection of bootstrap resamples
+
+
+
